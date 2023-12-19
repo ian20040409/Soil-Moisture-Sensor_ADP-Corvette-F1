@@ -5,8 +5,8 @@ int i;
 
 #define TRIG_PIN D6
 #define ECHO_PIN  D7
-const unsigned int MAX_DIST = 23200; // 最大探測距离
-const unsigned int MIN_WATER_LEVEL = 100; // 最低水位阈值 (cm)
+const unsigned int MAX_DIST = 74060000; // 最大探測距离
+const unsigned int MIN_WATER_LEVEL = 74051120; // 最低水位阈值 (cm)
 
 #define moisture D7
 #define pumpPin D8
@@ -45,8 +45,11 @@ void loop() {
   t1 = micros();
   pulse_width = t2 - t1;
   cm = pulse_width / 58.0;
-  if (cm > MAX_DIST || cm < MIN_WATER_LEVEL) {
+  if (cm < MIN_WATER_LEVEL) {
     playAlarm();
+    Serial.print("水位: ");
+    Serial.print(cm);
+    Serial.println("cm");
   } else {
     Serial.print("水位: ");
     Serial.print(cm);
@@ -59,7 +62,7 @@ void loop() {
   if (moistureValue < targetMoisture) {
     digitalWrite(pumpPin, HIGH);
     Serial.println("Watering...");
-    delay(waterAmount);
+    delay(wetWaterAmount);
     digitalWrite(pumpPin, LOW);
   } else {
     Serial.println("Fine");
@@ -71,10 +74,10 @@ void loop() {
 void playAlarm() {
   for (i = 0; i < 5; i++) {
     tone(speakerPin, NOTE_Med_DO);
-    delay(1000);
+    delay(500);
     noTone(speakerPin);
     tone(speakerPin, NOTE_Med_SO);
-    delay(1000);
+    delay(500);
     noTone(speakerPin);
   }
   Serial.println("水位低，請加水！");
